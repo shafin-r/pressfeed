@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PressFeed</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        background-color: #f5f5f5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .header {
+        width: 100%;
+        padding: 15px 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        position: relative;
+        z-index: 10;
+      }
+
+      .logo {
+        font-size: 24px;
+        font-weight: bold;
+        color: #ff3e5e;
+      }
+
+      .swipe-container {
+        width: 100%;
+        max-width: 400px;
+        height: calc(100vh - 60px);
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        overflow: hidden;
+      }
+
+      .card {
+        position: absolute;
+        width: 100%;
+        height: 70vh;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: transform 0.3s;
+        cursor: grab;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .card-image {
+        width: 100%;
+        height: 60%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+      }
+
+      .special-tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 4px 12px;
+        color: white;
+        font-weight: bold;
+        border-radius: 20px;
+        font-size: 12px;
+        z-index: 5;
+      }
+
+      .exclusive-tag {
+        background-color: #ff3e5e;
+      }
+
+      .promoted-tag {
+        background-color: #3498db;
+      }
+
+      .card-content {
+        padding: 20px;
+        height: 40%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      .headline {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .genre {
+        display: inline-block;
+        padding: 4px 10px;
+        background-color: #e9f5ff;
+        color: #0077cc;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .source {
+        color: #888;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+      }
+
+      .source-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        margin-right: 8px;
+        background-size: contain;
+        background-position: center;
+      }
+
+      .time {
+        font-size: 14px;
+        color: #888;
+        margin-top: auto;
+      }
+
+      .expanded-content {
+        padding: 20px;
+        height: 100%;
+        background: white;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+        z-index: 20;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        overflow-y: auto;
+      }
+
+      .expanded-content.active {
+        transform: translateY(0);
+      }
+
+      .close-expanded {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #888;
+      }
+
+      .expanded-headline {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        padding-right: 30px;
+      }
+
+      .expanded-genre {
+        display: inline-block;
+        padding: 4px 12px;
+        background-color: #e9f5ff;
+        color: #0077cc;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 15px;
+      }
+
+      .expanded-special-tags {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .expanded-special-tag {
+        padding: 4px 12px;
+        color: white;
+        font-weight: bold;
+        border-radius: 20px;
+        font-size: 12px;
+      }
+
+      .expanded-image {
+        width: 100%;
+        height: 200px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin-bottom: 15px;
+      }
+
+      .expanded-details {
+        margin: 15px 0;
+        line-height: 1.6;
+      }
+
+      .expanded-sources {
+        margin: 20px 0;
+      }
+
+      .expanded-source-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #555;
+      }
+
+      .source-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .source-item {
+        display: flex;
+        align-items: center;
+        padding: 8px 12px;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+      }
+
+      .action-buttons {
+        position: absolute;
+        bottom: 30px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        z-index: 5;
+      }
+
+      .action-button {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        background: white;
+        border: none;
+        cursor: pointer;
+        font-size: 24px;
+        transition: transform 0.2s, background 0.2s;
+      }
+
+      .action-button:hover {
+        transform: scale(1.1);
+      }
+
+      .back {
+        color: #3498db;
+      }
+
+      .back:hover {
+        background: #f0f8ff;
+      }
+
+      .dislike {
+        color: #fc5c65;
+      }
+
+      .dislike:hover {
+        background: #fff0f0;
+      }
+
+      .like {
+        color: #26de81;
+      }
+
+      .like:hover {
+        background: #f0fff5;
+      }
+
+      .back.disabled {
+        color: #ccc;
+        background: #f5f5f5;
+        cursor: not-allowed;
+      }
+
+      .back.disabled:hover {
+        transform: none;
+        background: #f5f5f5;
+      }
+
+      .swipe-indicator {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: bold;
+        opacity: 0;
+        transition: opacity 0.2s;
+        pointer-events: none;
+      }
+
+      .left-indicator {
+        background: rgba(252, 92, 101, 0.2);
+        color: #fc5c65;
+        left: 0;
+        border-radius: 15px;
+      }
+
+      .right-indicator {
+        background: rgba(38, 222, 129, 0.2);
+        color: #26de81;
+        right: 0;
+        border-radius: 15px;
+      }
+
+      .no-more-cards {
+        text-align: center;
+        padding: 20px;
+        color: #888;
+      }
+
+      @media (max-width: 600px) {
+        .card {
+          height: 60vh;
+        }
+      }
+
+      /* Add the following CSS to your existing stylesheet */
+
+      .up-indicator {
+        background: rgba(128, 128, 255, 0.2);
+        color: #6666ff;
+        top: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        border-radius: 15px 15px 0 0;
+      }
+
+      .source-headline {
+        font-size: 13px;
+        color: #444;
+        font-style: italic;
+        display: block;
+        margin-top: 3px;
+      }
+
+      .source-item {
+        margin-bottom: 12px;
+        padding: 10px;
+        background-color: #f8f8f8;
+        border-radius: 8px;
+        border-left: 3px solid #ddd;
+        transition: all 0.2s;
+      }
+
+      .source-item:hover {
+        background-color: #f0f0f0;
+        border-left-color: #0077cc;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">PressFeed</div>
+    </div>
+
+    <div class="swipe-container" id="swipeContainer">
+      <!-- Cards will be added here via JavaScript -->
+    </div>
+
+    <div class="action-buttons">
+      <button class="action-button back disabled" id="backBtn">↩</button>
+      <button class="action-button dislike" id="dislikeBtn">✕</button>
+      <button class="action-button like" id="likeBtn">→</button>
+    </div>
+
+    <div class="expanded-content" id="expandedContent">
+      <button class="close-expanded" id="closeExpanded">✕</button>
+      <div class="expanded-headline" id="expandedHeadline"></div>
+      <div class="expanded-genre" id="expandedGenre"></div>
+      <div class="expanded-special-tags" id="expandedSpecialTags"></div>
+      <img class="expanded-image" id="expandedImage" src="" alt="News Image" />
+      <div class="expanded-details" id="expandedDetails"></div>
+      <div class="expanded-sources" id="expandedSources">
+        <div class="source-list" id="sourceList"></div>
+      </div>
+    </div>
+
+    <script>
+      // Setup DOM elements
+      const swipeContainer = document.getElementById("swipeContainer");
+      const likeBtn = document.getElementById("likeBtn");
+      const dislikeBtn = document.getElementById("dislikeBtn");
+      const backBtn = document.getElementById("backBtn");
+      const expandedContent = document.getElementById("expandedContent");
+      const closeExpanded = document.getElementById("closeExpanded");
+      const expandedHeadline = document.getElementById("expandedHeadline");
+      const expandedGenre = document.getElementById("expandedGenre");
+      const expandedSpecialTags = document.getElementById(
+        "expandedSpecialTags"
+      );
+      const expandedImage = document.getElementById("expandedImage");
+      const expandedDetails = document.getElementById("expandedDetails");
+      const sourceList = document.getElementById("sourceList");
+
+      // Variables for touch handling
+      let currentX = 0;
+      let currentY = 0;
+      let initialX = 0;
+      let initialY = 0;
+      let xOffset = 0;
+      let yOffset = 0;
+      let currentCardIndex = 0;
+      let previousCardIndex = -1;
+      let isAnimating = false;
+      let lastSkippedCardIndex = -1; // Track only the most recent card for 1-time undo
+
+      // Add this comment in your HTML to know where to put your demo data
+      // ---- Insert your newsData array here ----
+      var newsData = [];
+
+      // Initialize the cards
+      function initCards() {
+        if (currentCardIndex >= newsData.length) {
+          swipeContainer.innerHTML =
+            '<div class="no-more-cards"><h2>No more news!</h2><p>Check back later for updates</p></div>';
+          updateBackButton();
+          return;
+        }
+
+        // Clear container
+        swipeContainer.innerHTML = "";
+
+        // Add current card
+        const news = newsData[currentCardIndex];
+        const card = createCard(news);
+        swipeContainer.appendChild(card);
+
+        // Add swipe indicators
+        const leftIndicator = document.createElement("div");
+        leftIndicator.className = "swipe-indicator left-indicator";
+        leftIndicator.textContent = "✕";
+        card.appendChild(leftIndicator);
+
+        const rightIndicator = document.createElement("div");
+        rightIndicator.className = "swipe-indicator right-indicator";
+        rightIndicator.textContent = "→";
+        card.appendChild(rightIndicator);
+
+        // Add up indicator for showing sources
+        const upIndicator = document.createElement("div");
+        upIndicator.className = "swipe-indicator up-indicator";
+        upIndicator.textContent = "⤴";
+        card.appendChild(upIndicator);
+
+        // Setup touch events
+        setupCardEvents(card);
+
+        // Update back button state
+        updateBackButton();
+      }
+
+      // Create a news card
+      function createCard(news) {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.id = news.id;
+
+        const cardImage = document.createElement("div");
+        cardImage.className = "card-image";
+        cardImage.style.backgroundImage = `url(${news.image})`;
+
+        // Add special tags if they exist
+        if (news.tags.exclusive || news.tags.promoted) {
+          if (news.tags.exclusive) {
+            const exclusiveTag = document.createElement("div");
+            exclusiveTag.className = "special-tag exclusive-tag";
+            exclusiveTag.textContent = "EXCLUSIVE";
+            cardImage.appendChild(exclusiveTag);
+          }
+
+          if (news.tags.promoted) {
+            const promotedTag = document.createElement("div");
+            promotedTag.className = "special-tag promoted-tag";
+            promotedTag.textContent = "PROMOTED";
+            promotedTag.style.left = news.tags.exclusive ? "110px" : "10px";
+            cardImage.appendChild(promotedTag);
+          }
+        }
+
+        const cardContent = document.createElement("div");
+        cardContent.className = "card-content";
+
+        const genre = document.createElement("div");
+        genre.className = "genre";
+        genre.textContent = news.genre;
+
+        const headline = document.createElement("div");
+        headline.className = "headline";
+        headline.textContent = news.headline;
+
+        // Show up to 3 sources (first three in the array)
+        const source = document.createElement("div");
+        source.className = "source";
+
+        const sourceIcon = document.createElement("div");
+        sourceIcon.className = "source-icon";
+        sourceIcon.style.backgroundImage = `url(${news.sources[0].icon})`;
+
+        const sourceText = document.createElement("span");
+
+        // Show multiple source indicator if more than 3 sources
+        let sourceDisplay = news.sources[0].name;
+        if (news.sources.length > 1) {
+          sourceDisplay += ", " + news.sources[1].name;
+        }
+        if (news.sources.length > 2) {
+          sourceDisplay += ", " + news.sources[2].name;
+        }
+        if (news.sources.length > 3) {
+          sourceDisplay += ` +${news.sources.length - 3} more`;
+        }
+
+        sourceText.textContent = sourceDisplay;
+
+        const time = document.createElement("div");
+        time.className = "time";
+        time.textContent = news.time;
+
+        source.appendChild(sourceIcon);
+        source.appendChild(sourceText);
+        cardContent.appendChild(genre);
+        cardContent.appendChild(headline);
+        cardContent.appendChild(source);
+        cardContent.appendChild(time);
+
+        card.appendChild(cardImage);
+        card.appendChild(cardContent);
+
+        return card;
+      }
+
+      // Setup touch events for a card
+      function setupCardEvents(card) {
+        card.addEventListener("touchstart", dragStart, false);
+        card.addEventListener("touchend", dragEnd, false);
+        card.addEventListener("touchmove", drag, false);
+
+        card.addEventListener("mousedown", dragStart, false);
+        card.addEventListener("mouseup", dragEnd, false);
+        card.addEventListener("mouseleave", dragEnd, false);
+        card.addEventListener("mousemove", drag, false);
+      }
+
+      // Handle drag start
+      function dragStart(e) {
+        if (isAnimating) return;
+
+        if (e.type === "touchstart") {
+          initialX = e.touches[0].clientX;
+          initialY = e.touches[0].clientY;
+        } else {
+          initialX = e.clientX;
+          initialY = e.clientY;
+        }
+
+        if (e.target.closest(".card")) {
+          e.target.closest(".card").style.transition = "";
+          e.target.closest(".card").style.cursor = "grabbing";
+        }
+      }
+
+      // Handle dragging
+      function drag(e) {
+        if (isAnimating) return;
+        if (initialX === 0 && initialY === 0) return;
+
+        e.preventDefault();
+
+        if (e.type === "touchmove") {
+          currentX = e.touches[0].clientX;
+          currentY = e.touches[0].clientY;
+        } else {
+          currentX = e.clientX;
+          currentY = e.clientY;
+        }
+
+        xOffset = currentX - initialX;
+        yOffset = currentY - initialY;
+
+        if (e.target.closest(".card")) {
+          const card = e.target.closest(".card");
+
+          // Determine if the movement is more horizontal or vertical
+          const isHorizontal = Math.abs(xOffset) > Math.abs(yOffset);
+
+          if (isHorizontal) {
+            card.style.transform = `translateX(${xOffset}px) rotate(${
+              xOffset * 0.03
+            }deg)`;
+
+            const leftIndicator = card.querySelector(".left-indicator");
+            const rightIndicator = card.querySelector(".right-indicator");
+            const upIndicator = card.querySelector(".up-indicator");
+
+            if (xOffset < -50) {
+              leftIndicator.style.opacity = Math.min(
+                Math.abs(xOffset) / 100,
+                1
+              );
+              rightIndicator.style.opacity = 0;
+              upIndicator.style.opacity = 0;
+            } else if (xOffset > 50) {
+              rightIndicator.style.opacity = Math.min(
+                Math.abs(xOffset) / 100,
+                1
+              );
+              leftIndicator.style.opacity = 0;
+              upIndicator.style.opacity = 0;
+            } else {
+              leftIndicator.style.opacity = 0;
+              rightIndicator.style.opacity = 0;
+              upIndicator.style.opacity = 0;
+            }
+          } else if (yOffset < -50) {
+            // Swiping up
+            card.style.transform = `translateY(${yOffset}px)`;
+
+            const leftIndicator = card.querySelector(".left-indicator");
+            const rightIndicator = card.querySelector(".right-indicator");
+            const upIndicator = card.querySelector(".up-indicator");
+
+            upIndicator.style.opacity = Math.min(Math.abs(yOffset) / 100, 1);
+            leftIndicator.style.opacity = 0;
+            rightIndicator.style.opacity = 0;
+          }
+        }
+      }
+
+      // Handle drag end
+      function dragEnd(e) {
+        if (isAnimating) return;
+        if (initialX === 0 && initialY === 0) return;
+
+        const card = document.querySelector(".card");
+        if (!card) return;
+
+        card.style.transition = "transform 0.3s ease";
+        card.style.cursor = "grab";
+
+        const isHorizontal = Math.abs(xOffset) > Math.abs(yOffset);
+
+        if (isHorizontal) {
+          if (xOffset < -100) {
+            // Swipe left
+            swipeLeft(card);
+          } else if (xOffset > 100) {
+            // Swipe right
+            swipeRight(card);
+          } else {
+            // Return to center
+            resetCardPosition(card);
+          }
+        } else if (yOffset < -100) {
+          // Swipe up to show sources
+          swipeUp(card);
+        } else {
+          resetCardPosition(card);
+        }
+
+        initialX = 0;
+        initialY = 0;
+        xOffset = 0;
+        yOffset = 0;
+      }
+
+      // Reset card position after a drag
+      function resetCardPosition(card) {
+        card.style.transform = "";
+        if (card.querySelector(".left-indicator"))
+          card.querySelector(".left-indicator").style.opacity = 0;
+        if (card.querySelector(".right-indicator"))
+          card.querySelector(".right-indicator").style.opacity = 0;
+        if (card.querySelector(".up-indicator"))
+          card.querySelector(".up-indicator").style.opacity = 0;
+      }
+
+      // Handle swipe left (dislike)
+      function swipeLeft(card) {
+        isAnimating = true;
+        card.style.transform = `translateX(-1000px) rotate(-30deg)`;
+
+        setTimeout(() => {
+          // Only keep track of the most recent card for 1-time undo
+          lastSkippedCardIndex = currentCardIndex;
+          currentCardIndex++;
+          initCards();
+          isAnimating = false;
+        }, 300);
+      }
+
+      // Handle swipe right (like)
+      function swipeRight(card) {
+        isAnimating = true;
+        card.style.transform = `translateX(1000px) rotate(30deg)`;
+
+        setTimeout(() => {
+          showExpandedContent(newsData[currentCardIndex]);
+
+          // Only keep track of the most recent card for 1-time undo
+          lastSkippedCardIndex = currentCardIndex;
+          currentCardIndex++;
+          initCards();
+          isAnimating = false;
+        }, 300);
+      }
+
+      // Handle swipe up (show sources)
+      function swipeUp(card) {
+        isAnimating = true;
+        card.style.transform = `translateY(-1000px)`;
+
+        setTimeout(() => {
+          showSourcesContent(newsData[currentCardIndex]);
+          resetCardPosition(card);
+          isAnimating = false;
+        }, 300);
+      }
+
+      // Show sources content
+      function showSourcesContent(news) {
+        // Use the existing expanded content view but customize it
+        expandedHeadline.textContent = news.headline;
+        expandedGenre.textContent = news.genre;
+        expandedImage.src = news.image;
+        expandedImage.alt = news.headline;
+
+        // Hide the details section
+        expandedDetails.style.display = "none";
+
+        // Add special tags if they exist
+        expandedSpecialTags.innerHTML = "";
+        if (news.tags.exclusive) {
+          const exclusiveTag = document.createElement("div");
+          exclusiveTag.className = "expanded-special-tag exclusive-tag";
+          exclusiveTag.textContent = "EXCLUSIVE";
+          expandedSpecialTags.appendChild(exclusiveTag);
+        }
+
+        if (news.tags.promoted) {
+          const promotedTag = document.createElement("div");
+          promotedTag.className = "expanded-special-tag promoted-tag";
+          promotedTag.textContent = "PROMOTED";
+          expandedSpecialTags.appendChild(promotedTag);
+        }
+
+        // Add all sources with their headlines
+        sourceList.innerHTML = "";
+
+        // Create a title specifically for sources view
+        const sourcesTitle = document.createElement("div");
+        sourcesTitle.className = "expanded-source-title";
+        sourcesTitle.textContent = "All Sources and Headlines:";
+        sourceList.appendChild(sourcesTitle);
+
+        news.sources.forEach((source) => {
+          const sourceItem = document.createElement("div");
+          sourceItem.className = "source-item";
+
+          const sourceIcon = document.createElement("div");
+          sourceIcon.className = "source-icon";
+          sourceIcon.style.backgroundImage = `url(${source.icon})`;
+
+          const sourceInfo = document.createElement("div");
+          sourceInfo.innerHTML = `
+                    <strong>${source.name}</strong> • ${source.time}<br>
+                    <span class="source-headline">${
+                      source.headline || news.headline
+                    }</span>
+                `;
+
+          sourceItem.appendChild(sourceIcon);
+          sourceItem.appendChild(sourceInfo);
+          sourceList.appendChild(sourceItem);
+        });
+
+        expandedContent.classList.add("active");
+      }
+
+      // Go back to previous card (only one time)
+      function goBack() {
+        if (lastSkippedCardIndex === -1 || isAnimating) return;
+
+        isAnimating = true;
+
+        // Go back to the last skipped card
+        currentCardIndex = lastSkippedCardIndex;
+
+        // Reset the last skipped card so it can't be undone again
+        lastSkippedCardIndex = -1;
+
+        // Create animation effect
+        const tempCard = document.createElement("div");
+        tempCard.className = "card";
+        tempCard.style.transform = "translateX(-1000px) rotate(-30deg)";
+        swipeContainer.appendChild(tempCard);
+
+        // Force reflow to apply initial transform
+        void tempCard.offsetWidth;
+
+        tempCard.style.transition = "transform 0.3s ease";
+        tempCard.style.transform = "";
+
+        setTimeout(() => {
+          initCards();
+          isAnimating = false;
+        }, 300);
+      }
+
+      // Update back button state
+      function updateBackButton() {
+        if (lastSkippedCardIndex !== -1) {
+          backBtn.classList.remove("disabled");
+        } else {
+          backBtn.classList.add("disabled");
+        }
+      }
+
+      // Show expanded content for a news item
+      function showExpandedContent(news) {
+        expandedHeadline.textContent = news.headline;
+        expandedGenre.textContent = news.genre;
+        expandedImage.src = news.image;
+        expandedImage.alt = news.headline;
+
+        // Show details (might be hidden in the sources view)
+        expandedDetails.style.display = "block";
+        expandedDetails.textContent = news.details;
+
+        // Add special tags if they exist
+        expandedSpecialTags.innerHTML = "";
+        if (news.tags.exclusive) {
+          const exclusiveTag = document.createElement("div");
+          exclusiveTag.className = "expanded-special-tag exclusive-tag";
+          exclusiveTag.textContent = "EXCLUSIVE";
+          expandedSpecialTags.appendChild(exclusiveTag);
+        }
+
+        if (news.tags.promoted) {
+          const promotedTag = document.createElement("div");
+          promotedTag.className = "expanded-special-tag promoted-tag";
+          promotedTag.textContent = "PROMOTED";
+          expandedSpecialTags.appendChild(promotedTag);
+        }
+
+        // Add all sources in the expanded view
+        sourceList.innerHTML = "";
+
+        const sourcesTitle = document.createElement("div");
+        sourcesTitle.className = "expanded-source-title";
+        sourcesTitle.textContent = "Sources Reporting This:";
+        sourceList.appendChild(sourcesTitle);
+
+        news.sources.forEach((source) => {
+          const sourceItem = document.createElement("div");
+          sourceItem.className = "source-item";
+
+          const sourceIcon = document.createElement("div");
+          sourceIcon.className = "source-icon";
+          sourceIcon.style.backgroundImage = `url(${source.icon})`;
+
+          const sourceInfo = document.createElement("div");
+          sourceInfo.innerHTML = `<strong>${source.name}</strong> • ${source.time}`;
+
+          sourceItem.appendChild(sourceIcon);
+          sourceItem.appendChild(sourceInfo);
+          sourceList.appendChild(sourceItem);
+        });
+
+        expandedContent.classList.add("active");
+      }
+
+      // Hide expanded content
+      function hideExpandedContent() {
+        expandedContent.classList.remove("active");
+      }
+
+      // Event listeners for buttons
+      likeBtn.addEventListener("click", () => {
+        const card = document.querySelector(".card");
+        if (card && !isAnimating) {
+          swipeRight(card);
+        }
+      });
+
+      dislikeBtn.addEventListener("click", () => {
+        const card = document.querySelector(".card");
+        if (card && !isAnimating) {
+          swipeLeft(card);
+        }
+      });
+
+      backBtn.addEventListener("click", () => {
+        if (!backBtn.classList.contains("disabled")) {
+          goBack();
+        }
+      });
+
+      closeExpanded.addEventListener("click", hideExpandedContent);
+
+      // Initialize
+      initCards();
+    </script>
+  </body>
+</html>
