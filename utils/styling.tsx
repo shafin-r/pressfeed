@@ -17,7 +17,7 @@ export const styling = {
   },
   logo: {
     fontSize: 24,
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     color: "#ff3e5e",
   },
   swipeContainer: {
@@ -44,7 +44,7 @@ export const styling = {
   },
   tagText: {
     color: "white",
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 12,
   },
   genre: {
@@ -55,7 +55,7 @@ export const styling = {
     alignSelf: "flex-start",
   },
   headline: {
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 22,
     marginVertical: 10,
   },
@@ -100,13 +100,13 @@ export const styling = {
   },
   noMoreCardsText: {
     fontSize: 22,
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     color: "#888",
     marginBottom: 10,
   },
   noMoreCardsSubtext: {
     fontSize: 16,
-    fontFamily: "SegoeUI",
+    fontFamily: "Segoe",
     color: "#aaa",
   },
   modalOverlay: {

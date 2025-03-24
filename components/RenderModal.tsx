@@ -55,7 +55,7 @@ const RenderModal = ({
         style={styles.expandedImage}
       />
 
-      {showSourcesOnly && (
+      {!showSourcesOnly && (
         <Text style={styles.expandedDetails}>{expandedContent.details}</Text>
       )}
 
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     color: "white",
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 12,
   },
   genre: {
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   headline: {
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 22,
     marginVertical: 10,
   },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   expandedHeadline: {
     fontSize: 24,
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     marginTop: 20,
     marginBottom: 15,
     paddingHorizontal: 20,
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
   },
   expandedGenreText: {
     color: "#0077cc",
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 14,
   },
   expandedSpecialTags: {
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
     fontSize: 16,
-    fontFamily: "SegoeUI",
+    fontFamily: "Segoe",
     lineHeight: 24,
     color: "#333",
   },
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   expandedSourceTitle: {
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 16,
     color: "#555",
     marginBottom: 10,
@@ -217,12 +217,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sourceItemTitle: {
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 14,
     color: "#333",
   },
   sourceHeadline: {
-    fontFamily: "SegoeUI",
+    fontFamily: "Segoe",
     fontSize: 13,
     fontStyle: "italic",
     color: "#444",

@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
   },
   tagText: {
     color: "white",
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 12,
   },
   cardContent: {
@@ -200,11 +200,11 @@ const styles = StyleSheet.create({
   },
   genreText: {
     color: "#0077cc",
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 12,
   },
   headline: {
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     fontSize: 22,
     marginVertical: 10,
   },
@@ -221,12 +221,12 @@ const styles = StyleSheet.create({
   sourceText: {
     color: "#888",
     fontSize: 14,
-    fontFamily: "SegoeUI",
+    fontFamily: "Segoe",
   },
   time: {
     color: "#888",
     fontSize: 14,
-    fontFamily: "SegoeUI",
+    fontFamily: "Segoe",
     marginTop: 10,
   },
   swipeIndicator: {
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   indicatorText: {
     fontSize: 32,
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     color: "#fff",
   },
 
@@ -259,13 +259,13 @@ const styles = StyleSheet.create({
   },
   noMoreCardsText: {
     fontSize: 22,
-    fontFamily: "SegoeUI-Bold",
+    fontFamily: "Segoe-Bold",
     color: "#888",
     marginBottom: 10,
   },
   noMoreCardsSubtext: {
     fontSize: 16,
-    fontFamily: "SegoeUI",
+    fontFamily: "Segoe",
     color: "#aaa",
   },
 });

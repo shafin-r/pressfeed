@@ -27,8 +27,8 @@ import RenderModal from "@/components/RenderModal";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Roboto_700Bold,
+    Segoe: require("@/assets/fonts/segoe-ui.ttf"),
+    "Segoe-Bold": require("@/assets/fonts/segoe-ui-bold.ttf"),
   });
   const { width, height } = Dimensions.get("window");
 
@@ -41,6 +41,7 @@ export default function App() {
   const [newsData, setNewsData] = useState(dummyData);
   const [expandedContent, setExpandedContent] = useState(null);
   const [showSourcesOnly, setShowSourcesOnly] = useState(false);
+  const [history, setHistory] = useState([]);
 
   const panResponder = useState(
     PanResponder.create({
@@ -91,7 +92,9 @@ export default function App() {
   };
 
   const swipeLeft = () => {
-    setLastSkippedIndex(currentIndex); // Store last skipped index
+    if (currentIndex >= newsData.length - 1) return;
+
+    setHistory((prevHistory) => [...prevHistory, currentIndex]); // Track previous index
 
     Animated.timing(position, {
       toValue: { x: -500, y: 0 },
@@ -104,40 +107,38 @@ export default function App() {
   };
 
   const swipeRight = () => {
-    setLastSkippedIndex(currentIndex); // Store last skipped index
+    if (currentIndex >= newsData.length - 1) return;
+
+    setHistory((prevHistory) => [...prevHistory, currentIndex]); // Track previous index
+    const selectedNews = newsData[currentIndex];
+
+    setExpandedContent(selectedNews); // ✅ Set modal content before updating index
+    setShowSourcesOnly(false);
 
     Animated.timing(position, {
       toValue: { x: 500, y: 0 },
       duration: 300,
       useNativeDriver: true,
     }).start(() => {
-      setSavedItems((prevSaved) => [...prevSaved, newsData[currentIndex]]);
+      setSavedItems((prevSaved) => [...prevSaved, selectedNews]);
       setCurrentIndex((prevIndex) => prevIndex + 1);
       position.setValue({ x: 0, y: 0 });
     });
   };
 
   const goBack = () => {
-    if (lastSkippedIndex === -1 || lastSkippedIndex >= newsData.length) return;
+    if (history.length === 0) return; // No history to go back to
 
-    setCurrentIndex(lastSkippedIndex);
-    setLastSkippedIndex(-1);
+    const lastIndex = history.pop(); // Get last swiped index and remove it from history
+    setCurrentIndex(lastIndex); // Restore last swiped card
+    setHistory([]); // Restore correct index
 
-    // Animate the card back to its original position smoothly
     Animated.timing(position, {
       toValue: { x: 0, y: 0 },
       duration: 300,
       useNativeDriver: true,
     }).start();
   };
-
-  useEffect(() => {
-    if (dummyData.length > 0) {
-      setNewsData(dummyData);
-    } else {
-      console.log("Dummy data is empty! Check import.");
-    }
-  }, []);
 
   useEffect(() => {
     currentIndexRef.current = currentIndex;
@@ -188,15 +189,15 @@ export default function App() {
         <TouchableOpacity
           style={[
             styles.actionButton,
-            currentIndex >= newsData.length ? styles.disabledButton : null,
+            history.length === 0 ? styles.disabledButton : null,
           ]}
           onPress={goBack}
-          disabled={currentIndex >= newsData.length}
+          disabled={history.length === 0} // ✅ Disable after one step back
         >
           <Ionicons
-            name="arrow-back"
-            size={35}
-            color={currentIndex >= newsData.length ? "#ccc" : "#2e00eb"}
+            name="return-down-back"
+            size={30}
+            color={history.length === 0 ? "#ccc" : "#0077cc"}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -216,15 +217,15 @@ export default function App() {
         <TouchableOpacity
           style={[
             styles.actionButton,
-            currentIndex >= newsData.length ? styles.disabledButton : null,
+            currentIndex >= newsData.length - 1 ? styles.disabledButton : null,
           ]}
           onPress={swipeRight}
-          disabled={currentIndex >= newsData.length}
+          disabled={currentIndex >= newsData.length - 1} // ✅ Fix this condition
         >
           <Ionicons
-            name="heart"
-            size={35}
-            color={currentIndex >= newsData.length ? "#ccc" : "red"}
+            name="arrow-forward"
+            size={25}
+            color={currentIndex >= newsData.length - 1 ? "#ccc" : "green"}
           />
         </TouchableOpacity>
       </View>
